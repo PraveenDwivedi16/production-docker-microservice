@@ -1,0 +1,59 @@
+services:
+  # ==========================================
+  # Database Service (PostgreSQL)
+  # ==========================================
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    # Production Healthcheck: Checks if Postgres is actually accepting queries
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ==========================================
+  # Backend API Service (Our Multi-Stage Node App)
+  # ==========================================
+  backend-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: devops-backend-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: ${PORT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    networks:
+      - app-network
+    # CRITICAL: App waits until Postgres passes healthcheck!
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+# ==========================================
+# Networks & Volumes Definition
+# ==========================================
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
