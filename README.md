@@ -14,7 +14,6 @@ A production-grade containerization architecture for a 2-Tier web application (N
 ## 📦 How to Run Locally
 
 ### 1. Clone the repository
-bash
 git clone https://github.com/PraveenDwivedi16/production-docker-microservice.git
 cd production-docker-microservice
 
