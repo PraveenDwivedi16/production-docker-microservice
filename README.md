@@ -29,11 +29,13 @@ curl http://localhost:3000/health
 # Output: {"status":"UP","database":"CONNECTED"}
 
 📊 Optimization Comparison
+
 Metric	Standard Single-Stage	Optimized Multi-Stage
 Base Image	node:18 (Debian)	node:18-alpine
 Security User	root (Vulnerable)	appuser (Hardened)
 Image Size	~850 MB	~195 MB (46.7 MB compressed)
 Attack Surface	High (Compilers/Tools included)	Minimal (Only production dependencies)
+
 
 
 Author: Praveen Dwivedi (AWS & RHCSA Certified DevOps Engineer)
